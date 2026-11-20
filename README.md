@@ -388,7 +388,7 @@ After signing in with the new admin password and syncing staging, both smoke tes
 
 Staging is on the same tag as before the rebuild (`v1.2.0`), and the repository HEAD (`53ebfd7…`) was the only input besides the key. The database contents from before the rebuild were lost, as the brief states. The fresh backup is larger (14199 vs 7087 bytes) only because `kubectl apply` added a `last-applied-configuration` annotation to the restored key.
 
-### Task 10 (bonus) — Multi-source Application
+### Task 10 — Multi-source Application
 
 ```yaml
 sources:
