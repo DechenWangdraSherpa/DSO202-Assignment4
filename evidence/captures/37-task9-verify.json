@@ -1,0 +1,22 @@
+[
+ {
+  "cmd": "argocd login localhost:8080 --username admin --password \"$(argocd admin initial-password -n argocd | head -1)\" --insecure",
+  "out": "'admin:login' logged in successfully\nContext 'localhost:8080' updated\n"
+ },
+ {
+  "cmd": "argocd app sync tasktracker-staging --timeout 300 | grep -E '^(Sync Revision|Phase|Message):'",
+  "out": "Sync Revision:      8847839ba9933c396480a708e77d7d951339f027\nPhase:              Succeeded\nMessage:            successfully synced (no more tasks)\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-staging | grep -E 'Target|Sync Status|Health Status'",
+  "out": "  Target:           v1.2.0\nSync Status:        Synced to v1.2.0 (8847839)\nHealth Status:      Healthy\n"
+ },
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Healthy\ntasktracker-staging   Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get job -A -l app=task-tracker",
+  "out": "NAMESPACE        NAME                     STATUS     COMPLETIONS   DURATION   AGE\ndso202-dev       tasktracker-smoke-test   Complete   1/1           4s         67s\ndso202-staging   tasktracker-smoke-test   Complete   1/1           4s         15s\n"
+ }
+]

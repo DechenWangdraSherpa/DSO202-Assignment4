@@ -1,0 +1,18 @@
+[
+ {
+  "cmd": "argocd app sync tasktracker-staging --timeout 300 | tail -12",
+  "out": "Message:            successfully synced (no more tasks)\n\nGROUP  KIND            NAMESPACE       NAME                    STATUS     HEALTH   HOOK      MESSAGE\n       ServiceAccount  dso202-staging  tasktracker             Synced                        serviceaccount/tasktracker created\n       ConfigMap       dso202-staging  app-config              Synced                        configmap/app-config created\n       Service         dso202-staging  db-svc                  Synced     Healthy            service/db-svc created\napps   StatefulSet     dso202-staging  database                Synced     Healthy            statefulset rolling update complete 1 pods at revision database-7d54444bf8...\n       Service         dso202-staging  backend-svc             Synced     Healthy            service/backend-svc created\napps   Deployment      dso202-staging  backend                 Synced     Healthy            deployment.apps/backend created\n       Service         dso202-staging  frontend-svc            Synced     Healthy            service/frontend-svc created\napps   Deployment      dso202-staging  frontend                Synced     Healthy            deployment.apps/frontend created\nbatch  Job             dso202-staging  tasktracker-smoke-test  Succeeded  Synced   PostSync  Reached expected number of succeeded pods\n"
+ },
+ {
+  "cmd": "kubectl get application root tasktracker-staging -n argocd   # root AFTER the first staging sync",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nroot                  Synced        Healthy\ntasktracker-staging   Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get svc -n dso202-staging",
+  "out": "NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE\nbackend-svc    ClusterIP   10.96.230.56    <none>        8080/TCP       16s\ndb-svc         ClusterIP   None            <none>        5432/TCP       25s\nfrontend-svc   NodePort    10.96.253.120   <none>        80:30081/TCP   10s\n"
+ },
+ {
+  "cmd": "kubectl logs job/tasktracker-smoke-test -n dso202-staging | cut -c1-100",
+  "out": "[{\"id\":1,\"title\":\"Set up kind cluster\",\"description\":\"Bring up the local cluster from Practical 1\",\"\n"
+ }
+]

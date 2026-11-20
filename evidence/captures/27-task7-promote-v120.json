@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "argocd app get tasktracker-staging | grep -E 'Target|Sync Status|Health Status|Deployment .*backend'",
+  "out": "  Target:           v1.2.0\nSync Status:        OutOfSync from v1.2.0 (8847839)\nHealth Status:      Healthy\napps   Deployment      dso202-staging  backend                 OutOfSync  Healthy            deployment.apps/backend unchanged\n"
+ },
+ {
+  "cmd": "argocd app sync tasktracker-staging --timeout 300 | grep -E '^(Sync Revision|Phase|Message):'",
+  "out": "Sync Revision:      8847839ba9933c396480a708e77d7d951339f027\nPhase:              Succeeded\nMessage:            successfully synced (no more tasks)\n"
+ },
+ {
+  "cmd": "kubectl get deploy backend -n dso202-staging -o jsonpath='{.spec.template.spec.containers[0].image}{\"\\n\"}'",
+  "out": "dwangshers/dso202-amd64-backend:1.1\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-staging | grep -E 'Sync Status|Health Status|smoke'",
+  "out": "Sync Status:        Synced to v1.2.0 (8847839)\nHealth Status:      Healthy\nbatch  Job             dso202-staging  tasktracker-smoke-test  Succeeded  Synced   PostSync  Reached expected number of succeeded pods\n"
+ },
+ {
+  "cmd": "argocd app history tasktracker-staging",
+  "out": "SOURCE  https://github.com/DechenWangdraSherpa/dso202-gitops.git\nID      DATE                           REVISION\n0       2026-11-20 14:19:46 +0600 +06  v1.0.0 (e2e7fd9)\n1       2026-11-20 14:43:36 +0600 +06  v1.1.0 (5100179)\n2       2026-11-20 15:06:25 +0600 +06  v1.2.0 (8847839)\n"
+ },
+ {
+  "cmd": "for rev in v1.0.0 v1.1.0 52f24e6 v1.2.0; do\n  f=$(git show ${rev}:environments/staging/values.yaml)\n  printf '%-7s backend %s  DB_SSLMODE=%s\\n' $rev \\\n    \"$(echo $f | grep -A5 '^backend:' | grep -o 'tag: \"[0-9.]*\"')\" \"$(echo $f | grep -o 'DB_SSLMODE: [a-z]*' | cut -d' ' -f2)\"\ndone",
+  "out": "v1.0.0  backend tag: \"1.0\"  DB_SSLMODE=\nv1.1.0  backend tag: \"1.0\"  DB_SSLMODE=\n52f24e6 backend tag: \"1.1\"  DB_SSLMODE=\nv1.2.0  backend tag: \"1.1\"  DB_SSLMODE=disable\n"
+ }
+]

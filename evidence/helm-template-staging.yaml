@@ -1,0 +1,477 @@
+---
+# Source: tasktracker/templates/serviceaccount.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/serviceaccount.yaml
+# Assignment  : DSO202 Assignment 4 (from Assignment 2, 02-rbac.yaml)
+# Descriptor  : Unit II 2.3 - ServiceAccounts
+# Purpose     : Identity for the Task Tracker Pods. No Role is bound to it
+#               and its token is not mounted. Roles and RoleBindings are
+#               platform objects (C8) and live in platform/<env>/rbac.yaml.
+# =====================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tasktracker
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: identity
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+automountServiceAccountToken: false
+
+---
+# Source: tasktracker/templates/configmap.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/configmap.yaml
+# Assignment  : DSO202 Assignment 4 (from Assignment 3)
+# Descriptor  : Unit I 1.5.3 - ConfigMaps
+# Purpose     : Non-secret settings shared by the three tiers. Credentials
+#               are NOT here: they come from the existing Secret (C3).
+# =====================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: config
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    # Wave 0, with the database: every tier reads this ConfigMap at start-up.
+    argocd.argoproj.io/sync-wave: "0"
+data:
+  DB_HOST: "db-svc"
+  DB_PORT: "5432"
+  DB_NAME: "taskdb"
+  APP_PORT: "8080"
+  CORS_ORIGIN: "*"
+  POSTGRES_DB: "taskdb"
+  BACKEND_URL: "http://localhost:8083"
+
+---
+# Source: tasktracker/templates/backend.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/backend.yaml
+# Assignment  : DSO202 Assignment 4 (from Assignment 3)
+# Descriptor  : Unit I 1.5 - Deployments, Services; Unit IV 4.3.2 - sync waves
+# Purpose     : REST API tier. Wave 1 (C5): applied after the database is
+#               Healthy and before the frontend.
+# =====================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  # The smoke-test Job (smoke-test-job.yaml) calls this name.
+  name: backend-svc
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: backend
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  type: ClusterIP
+  selector:
+    app: task-tracker
+    tier: backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+
+---
+# Source: tasktracker/templates/database.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/database.yaml
+# Assignment  : DSO202 Assignment 4 (StatefulSet from Assignment 2)
+# Descriptor  : Unit II 2.1 - StatefulSets; Unit IV 4.3.2 - sync waves
+# Purpose     : PostgreSQL tier. Wave 0 (C5): it must be Healthy before the
+#               backend (wave 1) is applied. The PVC comes from
+#               volumeClaimTemplates, so it is created by the StatefulSet
+#               controller, not rendered by the chart (C8, project whitelist).
+# =====================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-svc
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: database
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  # Headless: the StatefulSet's governing Service.
+  clusterIP: None
+  selector:
+    app: task-tracker
+    tier: database
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+
+---
+# Source: tasktracker/templates/frontend.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/frontend.yaml
+# Assignment  : DSO202 Assignment 4 (from Assignment 3)
+# Descriptor  : Unit I 1.5 - Deployments, NodePort Services; Unit IV 4.3.2
+# Purpose     : nginx frontend. Wave 2 (C5): applied last. The Service is a
+#               NodePort whose port is a value (C10): 30080 dev, 30081 staging.
+# =====================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: frontend
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  type: NodePort
+  selector:
+    app: task-tracker
+    tier: frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: 30081
+
+---
+# Source: tasktracker/templates/backend.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: backend
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  # C6: a stuck rollout is reported as failed (Degraded) after 120 s.
+  progressDeadlineSeconds: 120
+  selector:
+    matchLabels:
+      app: task-tracker
+      tier: backend
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tasktracker-0.4.0
+        app: task-tracker
+        tier: backend
+        app.kubernetes.io/instance: tasktracker
+        app.kubernetes.io/managed-by: Helm
+        dso202/assignment: "04"
+        dso202/environment: "staging"
+      annotations:
+        checksum/config: 4b601c9c3bf56c75707856a6665efb15e271c6dab5233f3c5dc0bff487731821
+    spec:
+      serviceAccountName: tasktracker
+      containers:
+        - name: api
+          image: "dwangshers/dso202-amd64-backend:1.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: DB_HOST}
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: DB_PORT}
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: DB_NAME}
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: APP_PORT}
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: CORS_ORIGIN}
+            # C3: credentials from the existing Secret named by a value.
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: {name: tasktracker-credentials, key: DB_USER}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: tasktracker-credentials, key: DB_PASSWORD}
+            # C2: per-tier variables from values (backend.env).
+            
+            - name: DB_SSLMODE
+              value: "disable"
+          # C4: GET /api/status answers 200 only when the database is reachable.
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+
+---
+# Source: tasktracker/templates/frontend.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: frontend
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  replicas: 1
+  # C6: a stuck rollout is reported as failed (Degraded) after 120 s.
+  progressDeadlineSeconds: 120
+  selector:
+    matchLabels:
+      app: task-tracker
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tasktracker-0.4.0
+        app: task-tracker
+        tier: frontend
+        app.kubernetes.io/instance: tasktracker
+        app.kubernetes.io/managed-by: Helm
+        dso202/assignment: "04"
+        dso202/environment: "staging"
+      annotations:
+        checksum/config: 4b601c9c3bf56c75707856a6665efb15e271c6dab5233f3c5dc0bff487731821
+    spec:
+      serviceAccountName: tasktracker
+      containers:
+        - name: web
+          image: "dwangshers/dso202-amd64-frontend:1.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: BACKEND_URL}
+            
+          # C4: nginx serves index.html.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+
+---
+# Source: tasktracker/templates/database.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: database
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    # C5: database first.
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  serviceName: db-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task-tracker
+      tier: database
+  # RollingUpdate (not OnDelete), so Argo CD can assess the StatefulSet's health.
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: tasktracker-0.4.0
+        app: task-tracker
+        tier: database
+        app.kubernetes.io/instance: tasktracker
+        app.kubernetes.io/managed-by: Helm
+        dso202/assignment: "04"
+        dso202/environment: "staging"
+      annotations:
+        checksum/config: 4b601c9c3bf56c75707856a6665efb15e271c6dab5233f3c5dc0bff487731821
+    spec:
+      serviceAccountName: tasktracker
+      containers:
+        - name: postgres
+          image: "dwangshers/dso202-amd64-db:1.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef: {name: app-config, key: POSTGRES_DB}
+            # C3: credentials from the existing Secret named by a value.
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: {name: tasktracker-credentials, key: POSTGRES_USER}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: tasktracker-credentials, key: POSTGRES_PASSWORD}
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            
+          # C4: ready only when PostgreSQL accepts connections.
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+# Source: tasktracker/templates/smoke-test-job.yaml
+# =====================================================================
+# File        : charts/tasktracker/templates/smoke-test-job.yaml
+# Assignment  : DSO202 Assignment 4
+# Descriptor  : Unit IV 4.3.2 - sync waves and hooks; 4.3.3 - health checks
+# Purpose     : A PostSync hook. Argo CD creates this Job only after every
+#               resource in the sync has been applied and is Healthy. If it
+#               fails, the sync is marked as failed.
+# Note        : Helm ignores the argocd.argoproj.io annotations, so
+#               'helm template' and 'helm install' still render this Job as an
+#               ordinary Job.
+# =====================================================================
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tasktracker-smoke-test
+  labels:
+    helm.sh/chart: tasktracker-0.4.0
+    app: task-tracker
+    tier: smoke-test
+    app.kubernetes.io/instance: tasktracker
+    app.kubernetes.io/managed-by: Helm
+    dso202/assignment: "04"
+    dso202/environment: "staging"
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    # BeforeHookCreation removes the previous run's Job just before the next
+    # run creates a new one, so the most recent result stays available to
+    # 'kubectl logs' between syncs.
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 120
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: tasktracker
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+        - name: smoke-test
+          image: busybox:1.37
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          # Requests are stated because the namespace ResourceQuota requires
+          # them on every Pod.
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Ten attempts, three seconds apart. backend-svc is the name of
+              # the backend Service rendered by templates/backend.yaml.
+              # GET /api/tasks reaches the database, so success proves that the
+              # backend, the Service, and the database are working together.
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                if wget -q -T 3 -O - http://backend-svc:8080/api/tasks; then
+                  exit 0
+                fi
+                echo "attempt ${attempt} failed"
+                sleep 3
+              done
+              exit 1

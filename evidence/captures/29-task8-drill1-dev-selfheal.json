@@ -1,0 +1,22 @@
+[
+ {
+  "cmd": "kubectl get deployment/backend -n dso202-dev -w | while IFS= read -r l; do print -r -- \"$(date +%T)  $l\"; done > ../evidence/task8-drill1-dev-watch.log &",
+  "out": ""
+ },
+ {
+  "cmd": "kubectl scale deployment/backend -n dso202-dev --replicas=3",
+  "out": "deployment.apps/backend scaled\n"
+ },
+ {
+  "cmd": "cat ../evidence/task8-drill1-dev-watch.log",
+  "out": "15:06:56  NAME      READY   UP-TO-DATE   AVAILABLE   AGE\n15:06:56  backend   1/1     1            1           48m\n15:06:59  backend   1/3     1            1           48m\n15:06:59  backend   1/3     1            1           48m\n15:06:59  backend   1/3     1            1           48m\n15:06:59  backend   1/3     3            1           48m\n15:06:59  backend   1/1     3            1           48m\n15:06:59  backend   1/1     3            1           48m\n15:06:59  backend   1/1     3            1           48m\n15:06:59  backend   1/1     1            1           48m\n15:07:30  backend   1/1     1            1           49m\n15:07:31  backend   1/1     1            1           49m\n"
+ },
+ {
+  "cmd": "kubectl get events -n argocd --field-selector involvedObject.name=tasktracker-dev --sort-by=.lastTimestamp | grep -E 'OutOfSync|Partial sync' | tail -2 | cut -c1-150",
+  "out": "41s         Normal    OperationCompleted   application/tasktracker-dev   Partial sync operation to b074c7ac6ac45afd1dbd7cda73d00e6d7d967269 succeeded\n41s         Normal    ResourceUpdated      application/tasktracker-dev   Updated sync status: OutOfSync -> Synced\n"
+ },
+ {
+  "cmd": "kubectl get deployment/backend -n dso202-dev",
+  "out": "NAME      READY   UP-TO-DATE   AVAILABLE   AGE\nbackend   1/1     1            1           49m\n"
+ }
+]

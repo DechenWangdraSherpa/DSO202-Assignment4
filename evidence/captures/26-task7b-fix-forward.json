@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "kubectl get pods -n dso202-dev",
+  "out": "NAME                           READY   STATUS      RESTARTS   AGE\nbackend-66896f5474-mhbk5       1/1     Running     0          58s\ndatabase-0                     1/1     Running     0          43m\nfrontend-66bcbf457b-pv8vt      1/1     Running     0          22m\ntasktracker-smoke-test-vpsf7   0/1     Completed   0          51s\n"
+ },
+ {
+  "cmd": "kubectl get deploy backend -n dso202-dev -o jsonpath='{.spec.template.spec.containers[0].image}{\"\\n\"}'",
+  "out": "dwangshers/dso202-amd64-backend:1.1\n"
+ },
+ {
+  "cmd": "kubectl logs backend-66896f5474-mhbk5 -n dso202-dev",
+  "out": "[config] release 1.1, sslmode=disable\n[db] connected\n[server] listening on :8080\n"
+ },
+ {
+  "cmd": "kubectl logs job/tasktracker-smoke-test -n dso202-dev | cut -c1-100",
+  "out": "[{\"id\":1,\"title\":\"Set up kind cluster\",\"description\":\"Bring up the local cluster from Practical 1\",\"\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-dev | grep -E 'Sync Status|Health Status'",
+  "out": "Sync Status:        Synced to main (8847839)\nHealth Status:      Healthy\n"
+ },
+ {
+  "cmd": "argocd app history tasktracker-dev",
+  "out": "SOURCE  https://github.com/DechenWangdraSherpa/dso202-gitops.git\nID      DATE                           REVISION\n0       2026-11-20 14:18:35 +0600 +06  main (0becf1d)\n1       2026-11-20 14:39:12 +0600 +06  main (5100179)\n2       2026-11-20 14:58:11 +0600 +06  main (55844bb)\n3       2026-11-20 15:00:37 +0600 +06  main (8847839)\n"
+ }
+]

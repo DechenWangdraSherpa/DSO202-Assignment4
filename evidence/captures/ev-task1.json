@@ -1,0 +1,62 @@
+[
+ {
+  "cmd": "docker version --format '{{.Server.Version}}'",
+  "out": "29.9.3\n"
+ },
+ {
+  "cmd": "kind version",
+  "out": "kind v0.32.0 go1.26.3 linux/amd64\n"
+ },
+ {
+  "cmd": "kubectl version --client",
+  "out": "Client Version: v1.36.6\nKustomize Version: v5.8.1\n"
+ },
+ {
+  "cmd": "helm version --short",
+  "out": "v4.3.1+gc0d08d0\n"
+ },
+ {
+  "cmd": "git --version",
+  "out": "git version 2.53.0\n"
+ },
+ {
+  "cmd": "argocd version --client --short",
+  "out": "argocd: v3.5.6+c2b1e30\n"
+ },
+ {
+  "cmd": "kubeseal --version",
+  "out": "kubeseal version: 0.40.0\n"
+ },
+ {
+  "cmd": "helm search repo sealed-secrets/sealed-secrets --versions | head -5",
+  "out": "NAME                         \tCHART VERSION\tAPP VERSION\tDESCRIPTION                                  \nsealed-secrets/sealed-secrets\t2.22.0       \t0.41.2     \tHelm chart for the sealed-secrets controller.\nsealed-secrets/sealed-secrets\t2.21.0       \t0.41.2     \tHelm chart for the sealed-secrets controller.\nsealed-secrets/sealed-secrets\t2.20.0       \t0.40.0     \tHelm chart for the sealed-secrets controller.\nsealed-secrets/sealed-secrets\t2.19.3       \t0.39.1     \tHelm chart for the sealed-secrets controller.\n"
+ },
+ {
+  "cmd": "helm lint charts/tasktracker -f environments/dev/values.yaml",
+  "out": "==> Linting charts/tasktracker\n[INFO] Chart.yaml: icon is recommended\n\n1 chart(s) linted, 0 chart(s) failed\n"
+ },
+ {
+  "cmd": "helm lint charts/tasktracker -f environments/staging/values.yaml",
+  "out": "==> Linting charts/tasktracker\n[INFO] Chart.yaml: icon is recommended\n\n1 chart(s) linted, 0 chart(s) failed\n"
+ },
+ {
+  "cmd": "helm template tasktracker charts/tasktracker -f environments/dev/values.yaml | grep -E '^kind:' | sort | uniq -c",
+  "out": "      1 kind: ConfigMap\n      2 kind: Deployment\n      1 kind: Job\n      3 kind: Service\n      1 kind: ServiceAccount\n      1 kind: StatefulSet\n"
+ },
+ {
+  "cmd": "kind get clusters",
+  "out": "dso202\ndso202-gitops\ndso202-p5\n"
+ },
+ {
+  "cmd": "kubectl config current-context",
+  "out": "kind-dso202-gitops\n"
+ },
+ {
+  "cmd": "kubectl get nodes",
+  "out": "NAME            STATUS   ROLES           AGE     VERSION\ncontrol-plane   Ready    control-plane   8m48s   v1.36.1\nworker-node-1   Ready    <none>          8m38s   v1.36.1\nworker-node-2   Ready    <none>          8m38s   v1.36.1\n"
+ },
+ {
+  "cmd": "docker ps --filter name=dso202-gitops --format '{{.Names}}   {{.Ports}}'",
+  "out": "dso202-gitops-control-plane   127.0.0.1:30080->30080/tcp, 127.0.0.1:34813->6443/tcp\ndso202-gitops-worker2   \ndso202-gitops-worker   \n"
+ }
+]

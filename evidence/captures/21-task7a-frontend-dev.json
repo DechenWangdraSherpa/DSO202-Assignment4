@@ -1,0 +1,22 @@
+[
+ {
+  "cmd": "grep -E 'frontend|smoke' ../evidence/task7-dev-pods-watch.log | grep -E 'Pending +0 +0s|1/1 +Running|Terminating|Completed' | awk '!seen[$2 $4]++'",
+  "out": "14:32:11  frontend-5cf56bdb9c-wfwbs      1/1     Running     0          13m\n14:32:11  tasktracker-smoke-test-cqwlf   0/1     Completed   0          13m\n14:39:02  frontend-66bcbf457b-pv8vt      0/1     Pending     0          0s\n14:39:08  frontend-66bcbf457b-pv8vt      1/1     Running             0          6s\n14:39:08  frontend-5cf56bdb9c-wfwbs      1/1     Terminating         0          20m\n14:39:09  tasktracker-smoke-test-4vl44   0/1     Pending             0          0s\n14:39:09  frontend-5cf56bdb9c-wfwbs      0/1     Completed           0          20m\n14:39:10  tasktracker-smoke-test-4vl44   1/1     Running             0          1s\n14:39:10  tasktracker-smoke-test-4vl44   0/1     Completed           0          1s\n"
+ },
+ {
+  "cmd": "argocd app history tasktracker-dev",
+  "out": "SOURCE  https://github.com/DechenWangdraSherpa/dso202-gitops.git\nID      DATE                           REVISION\n0       2026-11-20 14:18:35 +0600 +06  main (0becf1d)\n1       2026-11-20 14:39:12 +0600 +06  main (5100179)\n"
+ },
+ {
+  "cmd": "kubectl get deploy frontend -n dso202-dev -o jsonpath='{.spec.template.spec.containers[0].image}{\"\\n\"}'",
+  "out": "dwangshers/dso202-amd64-frontend:1.1\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:30080 | grep '<h1>'       # dev",
+  "out": "        <h1>Field&nbsp;Log <small class=\"release\">release 1.1</small></h1>\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8081 | grep '<h1>'        # staging (port-forward)",
+  "out": "        <h1>Field&nbsp;Log</h1>\n"
+ }
+]

@@ -1,0 +1,14 @@
+[
+ {
+  "cmd": "argocd proj get dso202",
+  "out": "Name:                        dso202\nDescription:                 Task Tracker workloads for the dev and staging environments\nDestinations:                https://kubernetes.default.svc,dso202-dev\n                             https://kubernetes.default.svc,dso202-staging\nRepositories:                https://github.com/DechenWangdraSherpa/dso202-gitops.git\nSource Namespaces:           <none>\nScoped Repositories:         <none>\nAllowed Cluster Resources:   <none>\nScoped Clusters:             <none>\nDenied Namespaced Resources: <none>\nSignature keys:              <none>\nOrphaned Resources:          disabled\n"
+ },
+ {
+  "cmd": "kubectl get appproject dso202 -n argocd -o jsonpath='{range .spec.namespaceResourceWhitelist[*]}{.group}/{.kind}{\"\\n\"}{end}'",
+  "out": "apps/Deployment\napps/StatefulSet\n/Service\n/ConfigMap\n/ServiceAccount\nbatch/Job\n"
+ },
+ {
+  "cmd": "helm template tasktracker charts/tasktracker -f environments/dev/values.yaml | grep -E '^kind:' | sort -u",
+  "out": "kind: ConfigMap\nkind: Deployment\nkind: Service\nkind: ServiceAccount\nkind: StatefulSet\n"
+ }
+]

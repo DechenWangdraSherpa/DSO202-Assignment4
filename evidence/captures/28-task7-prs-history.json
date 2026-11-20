@@ -1,0 +1,10 @@
+[
+ {
+  "cmd": "curl -s 'https://api.github.com/repos/DechenWangdraSherpa/dso202-gitops/pulls?state=all&direction=asc' | jq -r '.[] | \"#\\(.number)  \\(.state)  merged=\\(.merged_at != null)  \\(.head.ref) -> \\(.base.ref)  \\(.title)\"'",
+  "out": "#1  closed  merged=true  release/frontend-1.1 -> main  Release frontend 1.1 to dev and staging values\n#2  closed  merged=true  promote/staging-v1.1.0 -> main  Promote staging to v1.1.0\n#3  closed  merged=true  release/backend-1.1 -> main  Release backend 1.1 to dev and staging values\n#4  closed  merged=true  revert/backend-1.1 -> main  Revert \"Release backend 1.1 to dev and staging values (#3)\"\n#5  closed  merged=true  fix/backend-1.1-sslmode -> main  Fix forward: backend 1.1 with DB_SSLMODE=disable\n#6  closed  merged=true  promote/staging-v1.2.0 -> main  Promote staging to v1.2.0\n"
+ },
+ {
+  "cmd": "git log --oneline --graph --decorate -n 15",
+  "out": "* b074c7a (HEAD -> main, origin/main, origin/HEAD) Promote staging to v1.2.0 (#6)\n* 8847839 (tag: v1.2.0) Fix forward: backend 1.1 with DB_SSLMODE=disable (#5)\n* 55844bb Revert \"Release backend 1.1 to dev and staging values (#3)\" (#4)\n* 52f24e6 Release backend 1.1 to dev and staging values (#3)\n* 76010b6 Promote staging to v1.1.0 (#2)\n* 5100179 (tag: v1.1.0) Release frontend 1.1 to dev and staging values (#1)\n* 3a45b61 Permit controller-created ReplicaSets and Pods in dso202 so Pod logs are visible (Task 6)\n* 4bbf56f Grant reviewer read access to logs in the dso202 project (Task 6)\n* 0becf1d Add tasktracker-dev (main, automated) and tasktracker-staging (v1.0.0, manual) Applications (Listings 14, 15)\n* e2e7fd9 (tag: v1.0.0) Add PostSync smoke-test hook Job to the chart (Listing 13)\n* 276a8f4 Add platform-dev and platform-staging Applications (Listing 10)\n* 2c77ad1 Add sealed Task Tracker credentials for dev and staging (Listing 12)\n* 9f55e84 Install Sealed Secrets controller 0.40.0 (chart 2.20.0) through Argo CD (Listing 9)\n* 51d9964 Add platform and dso202 AppProjects and the root Application (Listings 6-8)\n* 2f5ce51 Add pinned Argo CD v3.5.6 bootstrap (Kustomize, Listings 2-5)\n"
+ }
+]

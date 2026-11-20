@@ -1,0 +1,14 @@
+[
+ {
+  "cmd": "kubectl apply -f bootstrap/root",
+  "out": "appproject.argoproj.io/platform created\nWarning: metadata.finalizers: \"resources-finalizer.argocd.argoproj.io\": prefer a domain-qualified finalizer name including a path (/) to avoid accidental conflicts with other finalizer writers\napplication.argoproj.io/root created\n"
+ },
+ {
+  "cmd": "kubectl get appproject,application -n argocd",
+  "out": "NAME                              AGE\nappproject.argoproj.io/default    33h\nappproject.argoproj.io/dso202     37s\nappproject.argoproj.io/platform   40s\n\nNAME                           SYNC STATUS   HEALTH STATUS\napplication.argoproj.io/root   Synced        Healthy\n"
+ },
+ {
+  "cmd": "argocd app get root",
+  "out": "Name:               argocd/root\nProject:            platform\nServer:             https://kubernetes.default.svc\nNamespace:          argocd\nURL:                https://localhost:8080/applications/root\nSource:\n- Repo:             https://github.com/DechenWangdraSherpa/dso202-gitops.git\n  Target:           main\n  Path:             argocd\nSyncWindow:         Sync Allowed\nSync Policy:        Automated (Prune)\nSync Status:        Synced to main (51d9964)\nHealth Status:      Healthy\n\nGROUP        KIND        NAMESPACE  NAME    STATUS  HEALTH  HOOK  MESSAGE\nargoproj.io  AppProject  argocd     dso202  Synced                appproject.argoproj.io/dso202 unchanged\n"
+ }
+]

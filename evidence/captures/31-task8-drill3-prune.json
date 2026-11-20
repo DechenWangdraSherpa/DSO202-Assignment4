@@ -1,0 +1,30 @@
+[
+ {
+  "cmd": "git log --oneline -1 -- platform/dev/prune-drill.yaml",
+  "out": "0ee9e15 Drill 3: add prune-drill ConfigMap (Listing 16)\n"
+ },
+ {
+  "cmd": "kubectl get configmap prune-drill -n dso202-dev",
+  "out": "NAME          DATA   AGE\nprune-drill   1      4s\n"
+ },
+ {
+  "cmd": "git log --oneline -2 -- platform/dev/prune-drill.yaml",
+  "out": "3aee28f Drill 3: remove prune-drill ConfigMap from Git\n0ee9e15 Drill 3: add prune-drill ConfigMap (Listing 16)\n"
+ },
+ {
+  "cmd": "kubectl get configmap prune-drill -n dso202-dev",
+  "out": "Error from server (NotFound): configmaps \"prune-drill\" not found\n"
+ },
+ {
+  "cmd": "kubectl get events -n argocd --field-selector involvedObject.name=platform-dev --sort-by=.lastTimestamp | grep -i -E 'prune|deleted|Operation' | tail -3 | cut -c1-160",
+  "out": "111s        Normal   OperationCompleted   application/platform-dev   Sync operation to 0ee9e1524c5e74f14cd6136e745df9d751f117e3 succeeded\n5s          Normal   OperationStarted     application/platform-dev   Initiated automated sync to '3aee28f6f3685868f8d1c4e9f702005563de3ffc'\n4s          Normal   OperationCompleted   application/platform-dev   Sync operation to 3aee28f6f3685868f8d1c4e9f702005563de3ffc succeeded\n"
+ },
+ {
+  "cmd": "argocd app get platform-dev | grep -E 'Sync Status|Health Status'",
+  "out": "Sync Status:        Synced to main (3aee28f)\nHealth Status:      Healthy\n"
+ },
+ {
+  "cmd": "kubectl get namespace dso202-dev -o jsonpath='{.metadata.annotations.argocd\\.argoproj\\.io/sync-options}{\"\\n\"}'",
+  "out": "Prune=false\n"
+ }
+]

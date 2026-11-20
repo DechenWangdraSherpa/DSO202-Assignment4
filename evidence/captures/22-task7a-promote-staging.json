@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "argocd app get tasktracker-staging | sed -n '/^Source/,/^Health/p;/frontend /p'",
+  "out": "Source:\n- Repo:             https://github.com/DechenWangdraSherpa/dso202-gitops.git\n  Target:           v1.1.0\n  Path:             charts/tasktracker\n  Helm Values:      ../../environments/staging/values.yaml\nSyncWindow:         Sync Allowed\nSync Policy:        Manual\nSync Status:        OutOfSync from v1.1.0 (5100179)\nHealth Status:      Healthy\napps   Deployment      dso202-staging  frontend                OutOfSync  Healthy            deployment.apps/frontend created\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8081 | grep '<h1>'        # staging still old before the sync",
+  "out": "        <h1>Field&nbsp;Log</h1>\n"
+ },
+ {
+  "cmd": "argocd app sync tasktracker-staging --timeout 300 | grep -E 'Sync Revision|Phase|Message|frontend |smoke'",
+  "out": "2026-11-20T14:43:21+06:00   apps  Deployment      dso202-staging              frontend    OutOfSync  Healthy              \n2026-11-20T14:43:21+06:00  batch         Job      dso202-staging  tasktracker-smoke-test             Healthy              \n2026-11-20T14:43:26+06:00   apps  Deployment  dso202-staging              frontend    Synced  Progressing              \n2026-11-20T14:43:28+06:00   apps  Deployment  dso202-staging              frontend    Synced  Progressing              deployment.apps/frontend configured\n2026-11-20T14:43:32+06:00   apps  Deployment  dso202-staging              frontend    Synced  Healthy              deployment.apps/frontend configured\n2026-11-20T14:43:32+06:00  batch         Job  dso202-staging  tasktracker-smoke-test   Running   Synced    PostSync  job.batch/tasktracker-smoke-test created\n2026-11-20T14:43:36+06:00  batch         Job  dso202-staging  tasktracker-smoke-test  Succeeded   Synced    PostSync  Reached expected number of succeeded pods\nSync Revision:      51001797238b78acc89d972548e1d789056beede\nPhase:              Succeeded\nMessage:            successfully synced (no more tasks)\napps   Deployment      dso202-staging  frontend                Synced     Healthy            deployment.apps/frontend configured\nbatch  Job             dso202-staging  tasktracker-smoke-test  Succeeded  Synced   PostSync  Reached expected number of succeeded pods\n"
+ },
+ {
+  "cmd": "kubectl port-forward -n dso202-staging svc/frontend-svc 8081:80 &   # old Pod was replaced, so forward again",
+  "out": "Forwarding from 127.0.0.1:8081 -> 8080\nForwarding from [::1]:8081 -> 8080\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8081 | grep '<h1>'        # staging after the manual sync",
+  "out": "        <h1>Field&nbsp;Log <small class=\"release\">release 1.1</small></h1>\n"
+ },
+ {
+  "cmd": "argocd app history tasktracker-staging",
+  "out": "SOURCE  https://github.com/DechenWangdraSherpa/dso202-gitops.git\nID      DATE                           REVISION\n0       2026-11-20 14:19:46 +0600 +06  v1.0.0 (e2e7fd9)\n1       2026-11-20 14:43:36 +0600 +06  v1.1.0 (5100179)\n"
+ }
+]

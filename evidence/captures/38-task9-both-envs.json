@@ -1,0 +1,42 @@
+[
+ {
+  "cmd": "kubectl port-forward -n dso202-staging svc/frontend-svc 8081:80 &",
+  "out": "Forwarding from 127.0.0.1:8081 -> 8080\nForwarding from [::1]:8081 -> 8080\n"
+ },
+ {
+  "cmd": "kubectl port-forward -n dso202-dev svc/backend-svc 8082:8080 &",
+  "out": "Forwarding from 127.0.0.1:8082 -> 8080\nForwarding from [::1]:8082 -> 8080\n"
+ },
+ {
+  "cmd": "kubectl port-forward -n dso202-staging svc/backend-svc 8083:8080 &",
+  "out": "Forwarding from 127.0.0.1:8083 -> 8080\nForwarding from [::1]:8083 -> 8080\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:30080 | grep '<h1>'    # dev frontend (NodePort)",
+  "out": "        <h1>Field&nbsp;Log <small class=\"release\">release 1.1</small></h1>\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8081 | grep '<h1>'     # staging frontend (port-forward)",
+  "out": "        <h1>Field&nbsp;Log <small class=\"release\">release 1.1</small></h1>\n"
+ },
+ {
+  "cmd": "curl -s -X POST http://localhost:8082/api/tasks -H 'Content-Type: application/json' -d '{\"title\":\"Rebuilt dev\"}'; echo",
+  "out": "{\"id\":4,\"title\":\"Rebuilt dev\",\"description\":null,\"status\":\"pending\",\"created_at\":\"2026-11-20T09:42:13.604Z\"}\n"
+ },
+ {
+  "cmd": "curl -s -X POST http://localhost:8083/api/tasks -H 'Content-Type: application/json' -d '{\"title\":\"Rebuilt staging\"}'; echo",
+  "out": "{\"id\":4,\"title\":\"Rebuilt staging\",\"description\":null,\"status\":\"pending\",\"created_at\":\"2026-11-20T09:42:13.628Z\"}\n"
+ },
+ {
+  "cmd": "kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key",
+  "out": "NAME                      TYPE                DATA   AGE\nsealed-secrets-keyfl2m8   kubernetes.io/tls   2      2m34s\n"
+ },
+ {
+  "cmd": "kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > ../dso202-keys/sealing-key.backup.yaml && chmod 600 ../dso202-keys/sealing-key.backup.yaml && ls -l ../dso202-keys/sealing-key.backup.yaml",
+  "out": "-rw------- 1 dw4ngsh3rs dw4ngsh3rs 14199 Nov 20 15:42 ../dso202-keys/sealing-key.backup.yaml\n"
+ },
+ {
+  "cmd": "date",
+  "out": "Fri Nov 20 03:42:13 PM +06 2026\n"
+ }
+]

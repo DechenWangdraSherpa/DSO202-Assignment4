@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "kubectl scale deployment/backend -n dso202-staging --replicas=3",
+  "out": "deployment.apps/backend scaled\n"
+ },
+ {
+  "cmd": "sleep 75; kubectl get deployment/backend -n dso202-staging   # 75 s later: not reverted",
+  "out": "NAME      READY   UP-TO-DATE   AVAILABLE   AGE\nbackend   3/3     3            3           49m\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-staging | grep -E 'Sync Policy|Sync Status|Health Status|Deployment .*backend'",
+  "out": "Sync Policy:        Manual\nSync Status:        OutOfSync from v1.2.0 (8847839)\nHealth Status:      Healthy\napps   Deployment      dso202-staging  backend                 OutOfSync  Healthy            deployment.apps/backend configured\n"
+ },
+ {
+  "cmd": "argocd app diff tasktracker-staging",
+  "out": "\n===== apps/Deployment dso202-staging/backend ======\n207c207\n<   replicas: 3\n---\n>   replicas: 1\n"
+ },
+ {
+  "cmd": "argocd app sync tasktracker-staging --timeout 300 | grep -E '^(Phase|Message):'",
+  "out": "Phase:              Succeeded\nMessage:            successfully synced (no more tasks)\n"
+ },
+ {
+  "cmd": "kubectl get deployment/backend -n dso202-staging",
+  "out": "NAME      READY   UP-TO-DATE   AVAILABLE   AGE\nbackend   1/1     1            1           49m\n"
+ }
+]

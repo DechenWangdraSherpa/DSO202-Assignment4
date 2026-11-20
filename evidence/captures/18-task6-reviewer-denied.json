@@ -1,0 +1,34 @@
+[
+ {
+  "cmd": "argocd account list",
+  "out": "NAME      ENABLED  CAPABILITIES\nadmin     true     login\nreviewer  true     login\n"
+ },
+ {
+  "cmd": "argocd account update-password --account reviewer \\\n  --current-password \"$(argocd admin initial-password -n argocd | head -1)\" \\\n  --new-password \"$(cat ../dso202-keys/argocd-reviewer-password.txt)\"",
+  "out": "Password updated\n"
+ },
+ {
+  "cmd": "argocd login localhost:8080 --username reviewer --password \"$(cat ../dso202-keys/argocd-reviewer-password.txt)\" --insecure --name reviewer",
+  "out": "'reviewer:login' logged in successfully\nContext 'reviewer' updated\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer app list -o name",
+  "out": "argocd/tasktracker-dev\nargocd/tasktracker-staging\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer account can-i get applications 'dso202/*'",
+  "out": "yes\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer account can-i sync applications 'dso202/*'",
+  "out": "no\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer account can-i get logs 'dso202/tasktracker-dev'",
+  "out": "no\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer proj get platform",
+  "out": "{\"level\":\"fatal\",\"msg\":\"rpc error: code = PermissionDenied desc = permission denied: projects, get, platform, sub: reviewer, iat: 2026-11-20T08:20:56Z\",\"time\":\"2026-11-20T14:20:56+06:00\"}\n"
+ }
+]

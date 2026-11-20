@@ -1,0 +1,30 @@
+[
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME             SYNC STATUS   HEALTH STATUS\nroot             Synced        Healthy\nsealed-secrets   Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get pods -n sealed-secrets",
+  "out": "NAME                                        READY   STATUS    RESTARTS   AGE\nsealed-secrets-controller-8b5ffdf69-xdhgm   1/1     Running   0          20s\n"
+ },
+ {
+  "cmd": "kubectl get crd sealedsecrets.bitnami.com",
+  "out": "NAME                        CREATED AT\nsealedsecrets.bitnami.com   2026-11-20T08:09:20Z\n"
+ },
+ {
+  "cmd": "mkdir -p ../dso202-keys",
+  "out": ""
+ },
+ {
+  "cmd": "kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > ../dso202-keys/sealing-key.backup.yaml",
+  "out": ""
+ },
+ {
+  "cmd": "chmod 600 ../dso202-keys/sealing-key.backup.yaml",
+  "out": ""
+ },
+ {
+  "cmd": "ls -l ../dso202-keys/",
+  "out": "total 8\n-rw------- 1 dw4ngsh3rs dw4ngsh3rs 7087 Nov 20 14:09 sealing-key.backup.yaml\n"
+ }
+]

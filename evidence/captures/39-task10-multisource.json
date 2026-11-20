@@ -1,0 +1,14 @@
+[
+ {
+  "cmd": "argocd app get tasktracker-dev --refresh | sed -n '1,/^Health Status/p'",
+  "out": "Name:               argocd/tasktracker-dev\nProject:            dso202\nServer:             https://kubernetes.default.svc\nNamespace:          dso202-dev\nURL:                https://localhost:8080/applications/tasktracker-dev\nSources:\n- Repo:             https://github.com/DechenWangdraSherpa/dso202-gitops.git\n  Target:           main\n  Path:             charts/tasktracker\n  Helm Values:      $values/environments/dev/values.yaml\n- Repo:             https://github.com/DechenWangdraSherpa/dso202-gitops.git\n  Target:           main\n  Ref:              values\nSyncWindow:         Sync Allowed\nSync Policy:        Automated (Prune)\nSync Status:        Synced to main\nHealth Status:      Healthy\n"
+ },
+ {
+  "cmd": "kubectl get application tasktracker-dev -n argocd -o jsonpath='{.status.sync.revisions}{\"\\n\"}'",
+  "out": "[\"7fe951b557bd6447141f4ef6f8387274404c2ed1\",\"7fe951b557bd6447141f4ef6f8387274404c2ed1\"]\n"
+ },
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Healthy\ntasktracker-staging   Synced        Healthy\n"
+ }
+]

@@ -1,0 +1,18 @@
+[
+ {
+  "cmd": "i=0\nwhile IFS='=' read -r key value; do\n  i=$((i+1)); env=$([ $i -le 4 ] && echo dev || echo staging)\n  [ \"${key#POSTGRES_}\" != \"$key\" ] && continue   # same values as DB_*\n  plain=$(git log -p --all -S\"$value\" | head | wc -l)\n  b64=$(git log -p --all -S\"$(printf %s \"$value\" | base64)\" | head | wc -l)\n  echo \"$env $key: plaintext matches=$plain base64 matches=$b64\"\ndone < ../dso202-keys/tasktracker-credentials.txt",
+  "out": "dev DB_USER: plaintext matches=0 base64 matches=0\ndev DB_PASSWORD: plaintext matches=0 base64 matches=0\nstaging DB_USER: plaintext matches=0 base64 matches=0\nstaging DB_PASSWORD: plaintext matches=0 base64 matches=0\n"
+ },
+ {
+  "cmd": "git log -p --all -S'kind: SealedSecret' | head | wc -l   # control: a string that IS in history",
+  "out": "10\n"
+ },
+ {
+  "cmd": "git ls-files | grep -c -E '\\.key$|sealing-key|\\.backup\\.yaml|secrets-plain|-plain\\.yaml'",
+  "out": "0\n"
+ },
+ {
+  "cmd": "git status --short --ignored",
+  "out": ""
+ }
+]

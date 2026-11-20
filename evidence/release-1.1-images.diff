@@ -1,0 +1,80 @@
+# Source changes used to build the 1.1 release images locally (from DSO202-Assignment, Assignment 1 source)
+# docker build -t dwangshers/dso202-amd64-frontend:1.1 frontend ; docker build -t dwangshers/dso202-amd64-backend:1.1 backend
+# dwangshers/dso202-amd64-backend:1.1  sha256:b0fe4df37a486bb5864616204802bbdf20bfbefa4090edaa49494ab32ec6e999
+# dwangshers/dso202-amd64-frontend:1.1  sha256:7b6280df6a8933cfeaa69fd9419b2e0e48dcbaa10a2888db470377962578580f
+diff '--color=auto' -ruN a/backend/package.json b/backend/package.json
+--- a/backend/package.json	2026-11-20 15:46:28.295351985 +0600
++++ b/backend/package.json	2026-11-20 15:46:28.312129381 +0600
+@@ -1,6 +1,6 @@
+ {
+   "name": "dso202-backend",
+-  "version": "1.0.0",
++  "version": "1.1.0",
+   "description": "Task Tracker REST API for DSO202 Assignment 1",
+   "private": true,
+   "main": "src/server.js",
+diff '--color=auto' -ruN a/backend/src/config.js b/backend/src/config.js
+--- a/backend/src/config.js	1970-01-01 05:30:00.000000000 +0530
++++ b/backend/src/config.js	2026-11-20 15:46:28.299610980 +0600
+@@ -0,0 +1,28 @@
++// Release 1.1: configuration loading refactored into one module.
++// Every setting is read once at start-up and validated; a missing required
++// setting stops the process with an explicit message instead of failing later.
++const REQUIRED = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_SSLMODE'];
++const SSL_MODES = ['disable', 'require'];
++
++function loadConfig() {
++  for (const key of REQUIRED) {
++    if (!process.env[key]) {
++      console.error(`[config] FATAL: required environment variable ${key} is not set (DB_SSLMODE must be one of: ${SSL_MODES.join(', ')})`);
++      process.exit(1);
++    }
++  }
++  if (!SSL_MODES.includes(process.env.DB_SSLMODE)) {
++    console.error(`[config] FATAL: DB_SSLMODE="${process.env.DB_SSLMODE}" is invalid (must be one of: ${SSL_MODES.join(', ')})`);
++    process.exit(1);
++  }
++  return {
++    host: process.env.DB_HOST,
++    port: Number(process.env.DB_PORT) || 5432,
++    database: process.env.DB_NAME,
++    user: process.env.DB_USER,
++    password: process.env.DB_PASSWORD,
++    ssl: process.env.DB_SSLMODE === 'require' ? { rejectUnauthorized: false } : false,
++  };
++}
++
++module.exports = { loadConfig };
+diff '--color=auto' -ruN a/backend/src/db.js b/backend/src/db.js
+--- a/backend/src/db.js	2026-11-20 15:46:28.295684126 +0600
++++ b/backend/src/db.js	2026-11-20 15:46:28.308796841 +0600
+@@ -2,13 +2,10 @@
+ 
+ // Every value comes from the environment -- no default points at a real
+ // host, user, or password, only local-dev placeholders for documentation.
+-const pool = new Pool({
+-  host: process.env.DB_HOST || 'localhost',
+-  port: Number(process.env.DB_PORT) || 5432,
+-  database: process.env.DB_NAME || 'devdb',
+-  user: process.env.DB_USER || 'devuser',
+-  password: process.env.DB_PASSWORD || 'devpass',
+-});
++const { loadConfig } = require('./config');
++const config = loadConfig();
++console.log(`[config] release 1.1, sslmode=${process.env.DB_SSLMODE}`);
++const pool = new Pool(config);
+ 
+ const RETRY_DELAY_MS = 2000;
+ 
+diff '--color=auto' -ruN a/frontend/public/index.html b/frontend/public/index.html
+--- a/frontend/public/index.html	2026-11-20 15:46:28.293743897 +0600
++++ b/frontend/public/index.html	2026-11-20 15:46:28.298784724 +0600
+@@ -20,7 +20,7 @@
+   <main class="paper">
+     <header class="letterhead">
+       <div class="letterhead-row">
+-        <h1>Field&nbsp;Log</h1>
++        <h1>Field&nbsp;Log <small class="release">release 1.1</small></h1>
+         <span id="statusPill" class="status-pill status-pill--pending">checking backend&hellip;</span>
+       </div>
+       <p class="subhead">task tracker &mdash; unit i deployment demo</p>

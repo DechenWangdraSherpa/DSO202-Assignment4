@@ -1,0 +1,14 @@
+[
+ {
+  "cmd": "head -1 ../evidence/task9-applications-watch.log; awk '$3==\"Synced\" && $4==\"Healthy\" && !seen[$2]++' ../evidence/task9-applications-watch.log",
+  "out": "15:40:28  NAME   SYNC STATUS   HEALTH STATUS\n15:40:38  sealed-secrets   Synced        Healthy\n15:40:40  platform-dev       Synced        Healthy\n15:40:40  platform-staging   Synced        Healthy\n15:40:41  root                  Synced        Healthy\n15:41:03  tasktracker-dev       Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Healthy\ntasktracker-staging   OutOfSync     Missing\n"
+ },
+ {
+  "cmd": "kubectl get sealedsecret -A",
+  "out": "NAMESPACE        NAME                      STATUS   SYNCED   AGE\ndso202-dev       tasktracker-credentials            True     42s\ndso202-staging   tasktracker-credentials            True     42s\n"
+ }
+]

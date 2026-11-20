@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "git log --oneline -4",
+  "out": "55844bb Revert \"Release backend 1.1 to dev and staging values (#3)\" (#4)\n52f24e6 Release backend 1.1 to dev and staging values (#3)\n76010b6 Promote staging to v1.1.0 (#2)\n5100179 Release frontend 1.1 to dev and staging values (#1)\n"
+ },
+ {
+  "cmd": "kubectl get events -n argocd --field-selector involvedObject.name=tasktracker-dev --sort-by=.lastTimestamp | grep -E 'Operation' | tail -4 | cut -c1-175",
+  "out": "11m         Normal    OperationStarted     application/tasktracker-dev   Initiated automated sync to '52f24e6dd656dedf5701380eeff0c03a4f779ca6'\n37s         Warning   OperationCompleted   application/tasktracker-dev   Sync operation to 52f24e6dd656dedf5701380eeff0c03a4f779ca6 failed: one or more synchronization tasks c\n36s         Normal    OperationStarted     application/tasktracker-dev   Initiated automated sync to '55844bb864c0e25a0bddf744772d427ed98e1ad6'\n24s         Normal    OperationCompleted   application/tasktracker-dev   Sync operation to 55844bb864c0e25a0bddf744772d427ed98e1ad6 succeeded\n"
+ },
+ {
+  "cmd": "argocd app history tasktracker-dev",
+  "out": "SOURCE  https://github.com/DechenWangdraSherpa/dso202-gitops.git\nID      DATE                           REVISION\n0       2026-11-20 14:18:35 +0600 +06  main (0becf1d)\n1       2026-11-20 14:39:12 +0600 +06  main (5100179)\n2       2026-11-20 14:58:11 +0600 +06  main (55844bb)\n"
+ },
+ {
+  "cmd": "kubectl get applications tasktracker-dev root -n argocd",
+  "out": "NAME              SYNC STATUS   HEALTH STATUS\ntasktracker-dev   Synced        Healthy\nroot              Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get pods -n dso202-dev",
+  "out": "NAME                           READY   STATUS      RESTARTS   AGE\nbackend-6566fcc54d-zbhsb       1/1     Running     0          40m\ndatabase-0                     1/1     Running     0          40m\nfrontend-66bcbf457b-pv8vt      1/1     Running     0          19m\ntasktracker-smoke-test-mc4c9   0/1     Completed   0          29s\n"
+ },
+ {
+  "cmd": "kubectl get deploy backend -n dso202-dev -o jsonpath='{.spec.template.spec.containers[0].image}{\"\\n\"}'",
+  "out": "dwangshers/dso202-amd64-backend:1.0\n"
+ }
+]

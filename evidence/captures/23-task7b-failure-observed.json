@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Degraded\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Degraded\ntasktracker-staging   Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get pods -n dso202-dev",
+  "out": "NAME                           READY   STATUS             RESTARTS      AGE\nbackend-6566fcc54d-zbhsb       1/1     Running            0             31m\nbackend-6bd9494747-cm48x       0/1     CrashLoopBackOff   4 (31s ago)   2m11s\ndatabase-0                     1/1     Running            0             31m\nfrontend-66bcbf457b-pv8vt      1/1     Running            0             10m\ntasktracker-smoke-test-4vl44   0/1     Completed          0             10m\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-dev | grep -E 'Sync Status|Health Status|Deployment .*backend|smoke'",
+  "out": "Sync Status:        Synced to main (52f24e6)\nHealth Status:      Degraded\napps   Deployment      dso202-dev  backend                 Synced  Degraded        Deployment \"backend\" exceeded its progress deadline\nbatch  Job             dso202-dev  tasktracker-smoke-test          Healthy         \n"
+ },
+ {
+  "cmd": "kubectl get deploy backend -n dso202-dev -o jsonpath='{range .status.conditions[*]}{.type}={.status} {.reason}: {.message}{\"\\n\"}{end}'",
+  "out": "Available=True MinimumReplicasAvailable: Deployment has minimum availability.\nProgressing=False ProgressDeadlineExceeded: ReplicaSet \"backend-6bd9494747\" has timed out progressing.\n"
+ },
+ {
+  "cmd": "curl -s -o /dev/null -w 'dev frontend HTTP %{http_code}\\n' http://localhost:30080",
+  "out": "dev frontend HTTP 200\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8082/api/status; echo",
+  "out": "{\"status\":\"ok\",\"db\":\"connected\"}\n"
+ }
+]

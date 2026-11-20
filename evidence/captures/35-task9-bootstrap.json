@@ -1,0 +1,18 @@
+[
+ {
+  "cmd": "kubectl apply -k bootstrap/argocd --server-side --force-conflicts | tail -2",
+  "out": "networkpolicy.networking.k8s.io/argocd-repo-server-network-policy serverside-applied\nnetworkpolicy.networking.k8s.io/argocd-server-network-policy serverside-applied\n"
+ },
+ {
+  "cmd": "kubectl wait --for=condition=Available deployment --all -n argocd --timeout=300s",
+  "out": "deployment.apps/argocd-applicationset-controller condition met\ndeployment.apps/argocd-dex-server condition met\ndeployment.apps/argocd-notifications-controller condition met\ndeployment.apps/argocd-redis condition met\ndeployment.apps/argocd-repo-server condition met\ndeployment.apps/argocd-server condition met\n"
+ },
+ {
+  "cmd": "kubectl rollout status statefulset/argocd-application-controller -n argocd --timeout=300s",
+  "out": "partitioned roll out complete: 1 new pods have been updated...\n"
+ },
+ {
+  "cmd": "kubectl apply -f bootstrap/root",
+  "out": "appproject.argoproj.io/platform created\nWarning: metadata.finalizers: \"resources-finalizer.argocd.argoproj.io\": prefer a domain-qualified finalizer name including a path (/) to avoid accidental conflicts with other finalizer writers\napplication.argoproj.io/root created\n"
+ }
+]

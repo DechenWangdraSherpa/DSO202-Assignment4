@@ -1,0 +1,22 @@
+[
+ {
+  "cmd": "export SEALED_SECRETS_CONTROLLER_NAMESPACE=sealed-secrets\nkubectl create secret generic tasktracker-credentials \\\n  --namespace dso202-dev \\\n  --from-env-file=secrets-plain/dev.env \\\n  --dry-run=client -o yaml \\\n  | kubeseal --format yaml \\\n  > platform/dev/tasktracker-credentials.sealed.yaml",
+  "out": ""
+ },
+ {
+  "cmd": "export SEALED_SECRETS_CONTROLLER_NAMESPACE=sealed-secrets\nkubectl create secret generic tasktracker-credentials \\\n  --namespace dso202-staging \\\n  --from-env-file=secrets-plain/staging.env \\\n  --dry-run=client -o yaml \\\n  | kubeseal --format yaml \\\n  > platform/staging/tasktracker-credentials.sealed.yaml",
+  "out": ""
+ },
+ {
+  "cmd": "grep -E 'kind|name:|namespace:|DB_|POSTGRES_' platform/dev/tasktracker-credentials.sealed.yaml | cut -c1-90",
+  "out": "kind: SealedSecret\n  name: tasktracker-credentials\n  namespace: dso202-dev\n    DB_PASSWORD: AgCj6r5Eo9v5vSclQ35wYkzZeu7GLKnrSgqNuKoV4iNa3PWx/LBStBFWOGKIpqhXivhM9Lg/Q\n    DB_USER: AgA4xtsBsw9gSCUTzBRo/FJv4UdCJDRpML6SJ2VzuSafZH6Z+mxkNS7qV/o4U2xYz4mtZbpmH7rDR\n    POSTGRES_PASSWORD: AgBYl9fltVGMOAqHPpXgeKsLLvmJUebPAGSqeqV7f7gGdVEfFP2PpHZcaRpyMkkEDQy\n    POSTGRES_USER: AgAmqLZe4PWyvbsW7AfmUoqPrjD1vlu3LzrxYP+x31XVR1wR7rmpcdGJHGdTO4o5xhqPuu3\n      name: tasktracker-credentials\n      namespace: dso202-dev\n"
+ },
+ {
+  "cmd": "rm secrets-plain/*.env",
+  "out": ""
+ },
+ {
+  "cmd": "git status --short --ignored",
+  "out": "?? platform/dev/tasktracker-credentials.sealed.yaml\n?? platform/staging/tasktracker-credentials.sealed.yaml\n"
+ }
+]

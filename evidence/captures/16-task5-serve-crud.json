@@ -1,0 +1,42 @@
+[
+ {
+  "cmd": "kubectl port-forward -n dso202-staging svc/frontend-svc 8081:80 &",
+  "out": "Forwarding from 127.0.0.1:8081 -> 8080\nForwarding from [::1]:8081 -> 8080\n"
+ },
+ {
+  "cmd": "kubectl port-forward -n dso202-dev svc/backend-svc 8082:8080 &",
+  "out": "Forwarding from 127.0.0.1:8082 -> 8080\nForwarding from [::1]:8082 -> 8080\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:30080 | grep -E '<h1>|subhead'",
+  "out": "        <h1>Field&nbsp;Log</h1>\n      <p class=\"subhead\">task tracker &mdash; unit i deployment demo</p>\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8081 | grep -E '<h1>|subhead'",
+  "out": "        <h1>Field&nbsp;Log</h1>\n      <p class=\"subhead\">task tracker &mdash; unit i deployment demo</p>\n"
+ },
+ {
+  "cmd": "curl -s -X POST http://localhost:8082/api/tasks -H 'Content-Type: application/json' -d '{\"title\":\"GitOps CRUD check\",\"description\":\"created in dev\"}'",
+  "out": "{\"id\":4,\"title\":\"GitOps CRUD check\",\"description\":\"created in dev\",\"status\":\"pending\",\"created_at\":\"2026-11-20T08:19:59.441Z\"}\n"
+ },
+ {
+  "cmd": "curl -s http://localhost:8082/api/tasks/4",
+  "out": "{\"id\":4,\"title\":\"GitOps CRUD check\",\"description\":\"created in dev\",\"status\":\"pending\",\"created_at\":\"2026-11-20T08:19:59.441Z\"}\n"
+ },
+ {
+  "cmd": "curl -s -X PUT http://localhost:8082/api/tasks/4 -H 'Content-Type: application/json' -d '{\"status\":\"done\"}'",
+  "out": "{\"id\":4,\"title\":\"GitOps CRUD check\",\"description\":\"created in dev\",\"status\":\"done\",\"created_at\":\"2026-11-20T08:19:59.441Z\"}\n"
+ },
+ {
+  "cmd": "curl -s -X DELETE -o /dev/null -w '%{http_code}\\n' http://localhost:8082/api/tasks/4",
+  "out": "204\n"
+ },
+ {
+  "cmd": "curl -s -o /dev/null -w '%{http_code}\\n' http://localhost:8082/api/tasks/4",
+  "out": "404\n"
+ },
+ {
+  "cmd": "kill %1 %2",
+  "out": ""
+ }
+]

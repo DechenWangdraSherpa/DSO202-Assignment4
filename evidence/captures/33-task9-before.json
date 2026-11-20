@@ -1,0 +1,26 @@
+[
+ {
+  "cmd": "kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > ../dso202-keys/sealing-key.backup.yaml && chmod 600 ../dso202-keys/sealing-key.backup.yaml",
+  "out": ""
+ },
+ {
+  "cmd": "ls -l ../dso202-keys/sealing-key.backup.yaml",
+  "out": "-rw------- 1 dw4ngsh3rs dw4ngsh3rs 7087 Nov 20 15:37 ../dso202-keys/sealing-key.backup.yaml\n"
+ },
+ {
+  "cmd": "kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key",
+  "out": "NAME                      TYPE                DATA   AGE\nsealed-secrets-keyfl2m8   kubernetes.io/tls   2      88m\n"
+ },
+ {
+  "cmd": "git rev-parse HEAD",
+  "out": "53ebfd79cb75637718a88b714956870be85fb648\n"
+ },
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Healthy\ntasktracker-staging   Synced        Healthy\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-staging | grep Target",
+  "out": "  Target:           v1.2.0\n"
+ }
+]

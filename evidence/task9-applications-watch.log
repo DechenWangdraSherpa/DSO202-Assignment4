@@ -1,0 +1,91 @@
+15:40:28  NAME   SYNC STATUS   HEALTH STATUS
+15:40:28  root                 
+15:40:31  root                 
+15:40:31  root                 
+15:40:31  root   OutOfSync     Missing
+15:40:32  root   OutOfSync     Healthy
+15:40:34  root   OutOfSync     Healthy
+15:40:34  sealed-secrets                 
+15:40:34  root             OutOfSync     Progressing
+15:40:36  sealed-secrets                 
+15:40:36  sealed-secrets                 
+15:40:36  sealed-secrets   OutOfSync     Missing
+15:40:36  root             OutOfSync     Progressing
+15:40:36  root             OutOfSync     Healthy
+15:40:37  sealed-secrets   OutOfSync     Progressing
+15:40:37  sealed-secrets   OutOfSync     Progressing
+15:40:37  sealed-secrets   OutOfSync     Progressing
+15:40:37  sealed-secrets   OutOfSync     Progressing
+15:40:37  root             OutOfSync     Progressing
+15:40:37  sealed-secrets   Synced        Progressing
+15:40:37  sealed-secrets   Synced        Progressing
+15:40:37  sealed-secrets   Synced        Progressing
+15:40:38  sealed-secrets   Synced        Healthy
+15:40:38  root             OutOfSync     Healthy
+15:40:38  platform-staging                 
+15:40:38  platform-dev                     
+15:40:38  root               OutOfSync     Progressing
+15:40:39  platform-staging                 
+15:40:39  platform-dev                     
+15:40:39  platform-staging                 
+15:40:39  platform-dev                     
+15:40:39  platform-staging   OutOfSync     Missing
+15:40:39  platform-dev       OutOfSync     Missing
+15:40:39  root               OutOfSync     Healthy
+15:40:39  platform-dev       OutOfSync     Healthy
+15:40:39  platform-staging   OutOfSync     Healthy
+15:40:39  platform-staging   OutOfSync     Healthy
+15:40:39  platform-dev       OutOfSync     Healthy
+15:40:40  platform-staging   OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-staging   OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-staging   OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-staging   Synced        Progressing
+15:40:40  platform-dev       OutOfSync     Healthy
+15:40:40  platform-dev       Synced        Healthy
+15:40:40  root               OutOfSync     Progressing
+15:40:40  platform-staging   Synced        Healthy
+15:40:40  platform-dev       Synced        Healthy
+15:40:40  root               OutOfSync     Healthy
+15:40:40  root               OutOfSync     Healthy
+15:40:40  tasktracker-dev                  
+15:40:40  tasktracker-staging                 
+15:40:40  root                  OutOfSync     Healthy
+15:40:40  root                  OutOfSync     Healthy
+15:40:41  root                  Synced        Progressing
+15:40:41  tasktracker-staging   OutOfSync     Missing
+15:40:41  tasktracker-dev                     
+15:40:41  tasktracker-dev       OutOfSync     Missing
+15:40:41  tasktracker-dev       OutOfSync     Missing
+15:40:41  root                  Synced        Healthy
+15:40:42  tasktracker-dev       OutOfSync     Healthy
+15:40:42  tasktracker-dev       OutOfSync     Progressing
+15:40:42  root                  Synced        Progressing
+15:40:44  tasktracker-dev       OutOfSync     Progressing
+15:40:44  tasktracker-dev       OutOfSync     Progressing
+15:40:51  tasktracker-dev       OutOfSync     Healthy
+15:40:51  tasktracker-dev       OutOfSync     Healthy
+15:40:51  root                  Synced        Healthy
+15:40:51  tasktracker-dev       OutOfSync     Progressing
+15:40:52  root                  Synced        Progressing
+15:40:53  tasktracker-dev       OutOfSync     Progressing
+15:40:53  tasktracker-dev       OutOfSync     Progressing
+15:40:57  tasktracker-dev       OutOfSync     Healthy
+15:40:57  root                  Synced        Healthy
+15:40:57  tasktracker-dev       OutOfSync     Healthy
+15:40:57  tasktracker-dev       Synced        Progressing
+15:40:57  root                  Synced        Progressing
+15:40:59  tasktracker-dev       Synced        Progressing
+15:40:59  tasktracker-dev       Synced        Progressing
+15:41:03  tasktracker-dev       Synced        Healthy
+15:41:03  tasktracker-dev       Synced        Healthy
+15:41:03  tasktracker-dev       Synced        Healthy
+15:41:03  root                  Synced        Healthy
+15:41:07  tasktracker-dev       Synced        Healthy
+15:41:07  tasktracker-dev       Synced        Healthy
+15:41:07  tasktracker-dev       Synced        Healthy

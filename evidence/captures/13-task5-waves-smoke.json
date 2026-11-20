@@ -1,0 +1,18 @@
+[
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       Synced        Healthy\ntasktracker-staging   OutOfSync     Missing\n"
+ },
+ {
+  "cmd": "grep -E 'Pending +0 +0s|1/1 +Running|Completed' ../evidence/task5-dev-pods-watch.log | awk '!seen[$2 $4]++'",
+  "out": "14:18:10  database-0   0/1     Pending   0          0s\n14:18:19  database-0   1/1     Running             0          9s\n14:18:19  backend-6566fcc54d-zbhsb   0/1     Pending             0          0s\n14:18:25  backend-6566fcc54d-zbhsb   1/1     Running             0          6s\n14:18:25  frontend-5cf56bdb9c-wfwbs   0/1     Pending             0          0s\n14:18:31  frontend-5cf56bdb9c-wfwbs   1/1     Running             0          6s\n14:18:31  tasktracker-smoke-test-cqwlf   0/1     Pending             0          0s\n14:18:33  tasktracker-smoke-test-cqwlf   1/1     Running             0          2s\n14:18:33  tasktracker-smoke-test-cqwlf   0/1     Completed           0          2s\n"
+ },
+ {
+  "cmd": "kubectl get job -n dso202-dev",
+  "out": "NAME                     STATUS     COMPLETIONS   DURATION   AGE\ntasktracker-smoke-test   Complete   1/1           4s         41s\n"
+ },
+ {
+  "cmd": "kubectl logs job/tasktracker-smoke-test -n dso202-dev | cut -c1-120",
+  "out": "[{\"id\":1,\"title\":\"Set up kind cluster\",\"description\":\"Bring up the local cluster from Practical 1\",\"status\":\"done\",\"crea\n"
+ }
+]

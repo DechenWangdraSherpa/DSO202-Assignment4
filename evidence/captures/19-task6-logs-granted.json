@@ -1,0 +1,30 @@
+[
+ {
+  "cmd": "git log --oneline -1 -- bootstrap/argocd/argocd-rbac-cm-patch.yaml",
+  "out": "4bbf56f Grant reviewer read access to logs in the dso202 project (Task 6)\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer account can-i get logs 'dso202/tasktracker-dev'   # before re-applying the bootstrap layer",
+  "out": "no\n"
+ },
+ {
+  "cmd": "kubectl apply -k bootstrap/argocd --server-side --force-conflicts | grep -E 'configmap/argocd-(rbac-)?cm'",
+  "out": "configmap/argocd-cm serverside-applied\nconfigmap/argocd-cmd-params-cm serverside-applied\nconfigmap/argocd-rbac-cm serverside-applied\n"
+ },
+ {
+  "cmd": "sleep 20; argocd --argocd-context reviewer account can-i get logs 'dso202/tasktracker-dev'",
+  "out": "yes\n"
+ },
+ {
+  "cmd": "argocd --argocd-context reviewer app logs tasktracker-dev --kind Deployment --group apps --name backend --tail 5",
+  "out": "[db] connected\n[server] listening on :8080\n"
+ },
+ {
+  "cmd": "argocd login localhost:8080 --username admin --password \"$(argocd admin initial-password -n argocd | head -1)\" --insecure",
+  "out": "'admin:login' logged in successfully\nContext 'localhost:8080' updated\n"
+ },
+ {
+  "cmd": "argocd context",
+  "out": "CURRENT  NAME            SERVER\n*        localhost:8080  localhost:8080\n         reviewer        localhost:8080\n"
+ }
+]

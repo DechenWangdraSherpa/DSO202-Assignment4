@@ -1,0 +1,25 @@
+* 7fe951b (HEAD -> main, origin/main, origin/HEAD) Task 10: convert tasktracker-dev to a multi-source Application
+* 53ebfd7 Revert "Drill 4: add a ResourceQuota to the workload chart (Listing 17)"
+* 02c081b Drill 4: add a ResourceQuota to the workload chart (Listing 17)
+* 3aee28f Drill 3: remove prune-drill ConfigMap from Git
+* 0ee9e15 Drill 3: add prune-drill ConfigMap (Listing 16)
+* b074c7a Promote staging to v1.2.0 (#6)
+* 8847839 (tag: v1.2.0) Fix forward: backend 1.1 with DB_SSLMODE=disable (#5)
+* 55844bb Revert "Release backend 1.1 to dev and staging values (#3)" (#4)
+* 52f24e6 Release backend 1.1 to dev and staging values (#3)
+* 76010b6 Promote staging to v1.1.0 (#2)
+* 5100179 (tag: v1.1.0) Release frontend 1.1 to dev and staging values (#1)
+* 3a45b61 Permit controller-created ReplicaSets and Pods in dso202 so Pod logs are visible (Task 6)
+* 4bbf56f Grant reviewer read access to logs in the dso202 project (Task 6)
+* 0becf1d Add tasktracker-dev (main, automated) and tasktracker-staging (v1.0.0, manual) Applications (Listings 14, 15)
+* e2e7fd9 (tag: v1.0.0) Add PostSync smoke-test hook Job to the chart (Listing 13)
+* 276a8f4 Add platform-dev and platform-staging Applications (Listing 10)
+* 2c77ad1 Add sealed Task Tracker credentials for dev and staging (Listing 12)
+* 9f55e84 Install Sealed Secrets controller 0.40.0 (chart 2.20.0) through Argo CD (Listing 9)
+* 51d9964 Add platform and dso202 AppProjects and the root Application (Listings 6-8)
+* 2f5ce51 Add pinned Argo CD v3.5.6 bootstrap (Kustomize, Listings 2-5)
+* af3cffd Add Assignment 2 quota, limits and RBAC for dev and staging
+* 9eaac25 Add dev and staging values files (baseline images 1.0)
+* 187402a Add Task Tracker Helm chart adapted to the GitOps chart contract C1-C11
+* 3c75fad Add kind cluster configuration from Practical 1 (dso202-gitops)
+* f19ac4c Add .gitignore before any other file (Listing 1)

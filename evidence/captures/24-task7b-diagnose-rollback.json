@@ -1,0 +1,18 @@
+[
+ {
+  "cmd": "kubectl describe pod backend-6bd9494747-cm48x -n dso202-dev | sed -n '/^Containers:/,/^Conditions:/p' | grep -E 'Image:|State:|Reason:|Exit Code|Restart Count|Last State'",
+  "out": "    Image:          dwangshers/dso202-amd64-backend:1.1\n    State:          Waiting\n      Reason:       CrashLoopBackOff\n    Last State:     Terminated\n      Reason:       Error\n      Exit Code:    1\n    Restart Count:  4\n"
+ },
+ {
+  "cmd": "kubectl describe pod backend-6bd9494747-cm48x -n dso202-dev | sed -n '/^Events:/,$p' | tail -5",
+  "out": "  Normal   Scheduled  2m12s                default-scheduler  Successfully assigned dso202-dev/backend-6bd9494747-cm48x to worker-node-2\n  Normal   Pulled     33s (x5 over 2m12s)  kubelet            spec.containers{api}: Container image \"dwangshers/dso202-amd64-backend:1.1\" already present on machine and can be accessed by the pod\n  Normal   Created    33s (x5 over 2m12s)  kubelet            spec.containers{api}: Container created\n  Normal   Started    33s (x5 over 2m11s)  kubelet            spec.containers{api}: Container started\n  Warning  BackOff    31s (x7 over 2m9s)   kubelet            spec.containers{api}: Back-off restarting failed container api in pod backend-6bd9494747-cm48x_dso202-dev(debb42ce-bd2e-452d-9183-84c01bf71b49)\n"
+ },
+ {
+  "cmd": "kubectl logs backend-6bd9494747-cm48x -n dso202-dev",
+  "out": "[config] FATAL: required environment variable DB_SSLMODE is not set (DB_SSLMODE must be one of: disable, require)\n"
+ },
+ {
+  "cmd": "argocd app rollback tasktracker-dev",
+  "out": "{\"level\":\"fatal\",\"msg\":\"rpc error: code = FailedPrecondition desc = rollback cannot be initiated when auto-sync is enabled\",\"time\":\"2026-11-20T14:49:48+06:00\"}\n"
+ }
+]

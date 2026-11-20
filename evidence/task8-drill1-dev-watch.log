@@ -1,0 +1,12 @@
+15:06:56  NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+15:06:56  backend   1/1     1            1           48m
+15:06:59  backend   1/3     1            1           48m
+15:06:59  backend   1/3     1            1           48m
+15:06:59  backend   1/3     1            1           48m
+15:06:59  backend   1/3     3            1           48m
+15:06:59  backend   1/1     3            1           48m
+15:06:59  backend   1/1     3            1           48m
+15:06:59  backend   1/1     3            1           48m
+15:06:59  backend   1/1     1            1           48m
+15:07:30  backend   1/1     1            1           49m
+15:07:31  backend   1/1     1            1           49m

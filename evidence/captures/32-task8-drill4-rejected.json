@@ -1,0 +1,30 @@
+[
+ {
+  "cmd": "argocd app get tasktracker-dev | grep -E 'Sync Status|Health Status|ResourceQuota'",
+  "out": "Sync Status:        OutOfSync from main (02c081b)\nHealth Status:      Healthy\n       ResourceQuota   dso202-dev  drill-quota             Unknown  Missing        resource :ResourceQuota is not permitted in project dso202\n"
+ },
+ {
+  "cmd": "kubectl get application tasktracker-dev -n argocd -o jsonpath='{.status.operationState.phase}: {.status.operationState.message}{\"\\n\"}'",
+  "out": "Running: one or more synchronization tasks are not valid: resource :ResourceQuota is not permitted in project dso202. Retrying attempt #3 at 9:20AM.\n"
+ },
+ {
+  "cmd": "kubectl get applications -n argocd",
+  "out": "NAME                  SYNC STATUS   HEALTH STATUS\nplatform-dev          Synced        Healthy\nplatform-staging      Synced        Healthy\nroot                  Synced        Healthy\nsealed-secrets        Synced        Healthy\ntasktracker-dev       OutOfSync     Healthy\ntasktracker-staging   Synced        Healthy\n"
+ },
+ {
+  "cmd": "kubectl get resourcequota -n dso202-dev -o name",
+  "out": "resourcequota/assignment-quota\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-staging | grep -E 'Target|Sync Status|Health Status'",
+  "out": "  Target:           v1.2.0\nSync Status:        Synced to v1.2.0 (8847839)\nHealth Status:      Healthy\n"
+ },
+ {
+  "cmd": "git log --oneline -2",
+  "out": "53ebfd7 Revert \"Drill 4: add a ResourceQuota to the workload chart (Listing 17)\"\n02c081b Drill 4: add a ResourceQuota to the workload chart (Listing 17)\n"
+ },
+ {
+  "cmd": "argocd app get tasktracker-dev --show-operation | grep -E '^(Sync Revision|Phase|Sync Status|Health Status):'",
+  "out": "Sync Status:        Synced to main (53ebfd7)\nHealth Status:      Healthy\nSync Revision:      02c081b1713975bca2683c13d7e073b47fa3df6c\nPhase:              Failed\n"
+ }
+]
